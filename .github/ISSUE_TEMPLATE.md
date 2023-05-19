@@ -2,7 +2,7 @@
 name: Workflow Failure
 about: An issue is created when a workflow fails.
 title: Workflow Failure in {{ env.WORKFLOW_NAME }} run
-labels: bug, workflow
+labels: bug, workflow, installer
 assignees: 'PunGrumpy'
 ---
 
