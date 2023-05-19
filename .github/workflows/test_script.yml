@@ -43,13 +43,14 @@ jobs:
           rm -rf ~/dotfiles_temp
 
       - name: Capture Workflow Artifacts
-        uses: actions/upload-artifact@v3
         if: failure()
+        uses: actions/upload-artifact@v3
         with:
           name: Logs
           path: ~/dotfile_test
 
       - name: Run script and capture errors
+        if: failure()
         id: error_capture
         run: |
           ./your_script.sh 2> error.log || echo ::set-output name=error::$(cat error.log)
