@@ -1,0 +1,51 @@
+name: Test Bash Script
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  test_script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set execute permissions on script
+        run: |
+          chmod +x install.sh
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git whiptail neovim
+
+      - name: Run Script with Default URL
+        run: |
+          ./install.sh -s -i
+
+      - name: Cleanup
+        run: |
+          rm -rf ~/dotfiles_temp
+
+      - name: Test Dotfiles Installation
+        run: |
+          [[ -f ~/.dotfile_test ]] || exit 1
+
+      - name: Capture Workflow Artifacts
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: Logs
+          path: ~/dotfile_test
+
+      - name: Create Issue on Failure
+        if: failure()
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
