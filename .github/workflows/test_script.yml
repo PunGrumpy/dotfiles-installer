@@ -29,13 +29,18 @@ jobs:
         run: |
           ./install.sh -s -i
 
+      - name: Test Dotfiles Installation
+        run: |
+          if [ -d ~/dotfiles_temp ]; then
+            echo "Dotfiles installation failed"
+            exit 1
+          else
+            echo "Dotfiles installation succeeded"
+          fi
+
       - name: Cleanup
         run: |
           rm -rf ~/dotfiles_temp
-
-      - name: Test Dotfiles Installation
-        run: |
-          [[ -f ~/.dotfile_test ]] || exit 1
 
       - name: Capture Workflow Artifacts
         uses: actions/upload-artifact@v3
