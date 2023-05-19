@@ -1,19 +1,19 @@
 ---
 name: Workflow Failure
 about: An issue is created when a workflow fails.
-title: Workflow Failure in {{ github.workflow }} run
+title: Workflow Failure in {{ env.WORKFLOW_NAME }} run
 labels: bug, workflow
 assignees: 'PunGrumpy'
 ---
 
 ## Workflow Failure
 
-The workflow run [{{ github.workflow }}]({{ github.server_url }}/{{ github.repository }}/actions/runs/{{ github.run_id }}) failed.
+The workflow run [{{ env.WORKFLOW_NAME }}]({{ env.SERVER_URL }}/{{ env.REPOSITORY }}/actions/runs/{{ env.ACTION_ID }}) failed.
 
 ### Details
 
-**Error message:** _The error message is not directly available in the `github` context or the event payload. It should be manually extracted from the logs and inserted here._
+**Error message:** steps.error_capture.outputs.error
 
-**Logs:** [View logs]({{ github.server_url }}/{{ github.repository }}/actions/runs/{{ github.run_id }})
+**Logs:** [View logs]({{ env.SERVER_URL }}/{{ env.REPOSITORY }}/actions/runs/{{ env.ACTION_ID }})
 
-**Workflow run ID:** {{ github.run_id }}
+**Workflow run ID:** {{ env.ACTION_ID }}

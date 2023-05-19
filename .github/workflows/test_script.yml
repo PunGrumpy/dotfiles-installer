@@ -44,8 +44,17 @@ jobs:
           name: Logs
           path: ~/dotfile_test
 
+      - name: Run script and capture errors
+        id: error_capture
+        run: |
+          ./your_script.sh 2> error.log || echo ::set-output name=error::$(cat error.log)
+
       - name: Create Issue on Failure
         if: failure()
         uses: JasonEtco/create-an-issue@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WORKFLOW_NAME: ${{ github.workflow }}
+          SERVER_URL: ${{ github.server_url }}
+          REPOSITORY: ${{ github.repository }}
+          ACTION_ID: ${{ github.run_id }}
