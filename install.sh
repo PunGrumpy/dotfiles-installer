@@ -109,7 +109,7 @@ cd ~
 rm -rf ~/dotfiles_temp
 
 # Check if the current shell is Fish
-if [ $SHELL = '/usr/bin/fish' || $SHELL = '/home/linuxbrew/.linuxbrew/bin/fish' ]; then
+if [[ $SHELL = '/usr/bin/fish' || $SHELL = '/home/linuxbrew/.linuxbrew/bin/fish' ]]; then
   if [ $yes = 1 ] || (whiptail --yesno "You are using Fish shell. Would you like to install optional tools?" 8 78); then
     install_fisher
   fi
