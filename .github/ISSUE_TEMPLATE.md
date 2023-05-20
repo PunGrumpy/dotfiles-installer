@@ -6,13 +6,15 @@ labels: bug, workflow, installer
 assignees: 'PunGrumpy'
 ---
 
-## Workflow Failure
+# {{ env.ISSUE_TITLE }} ⚙️
+
+## Workflow Failure 💔
 
 The workflow run [{{ env.WORKFLOW_NAME }}]({{ env.SERVER_URL }}/{{ env.REPOSITORY }}/actions/runs/{{ env.ACTION_ID }}) failed.
 
-### Details
+### Details 📝
 
-**Error message:** {{ steps.error_capture.outputs.error }}
+**Error message:** {{ ERROR_MESSAGE }}
 
 **Logs:** [View logs]({{ env.SERVER_URL }}/{{ env.REPOSITORY }}/actions/runs/{{ env.ACTION_ID }})
 

@@ -67,24 +67,8 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# If whiptail is not available, install it
-if ! command -v whiptail &> /dev/null; then
-    echo "Whiptail not found. Attempting to install it..."
-    sudo apt-get install -y whiptail || { echo "Failed to install whiptail. Exiting..."; exit 1; }
-fi
-
-# Get the URL
-if [ $yes = 0 ]; then
-    url=$(whiptail --inputbox "Enter the URL of the dotfiles repository" 8 78 "$url" --title "Dotfiles Installation" 3>&1 1>&2 2>&3)
-    exitstatus=$?
-    if [ $exitstatus != 0 ]; then
-        echo "User cancelled the operation."
-        exit 1
-    fi
-fi
-
 # Clone the repository
-git clone "$url" ~/dotfiles_temp || { whiptail --msgbox "Failed to clone repository" 8 78; exit 1; }
+git clone "$url" ~/dotfiles_temp || { echo "Failed to clone repository"; exit 1; }
 
 # Change directory to the cloned repository
 cd ~/dotfiles_temp
@@ -93,8 +77,10 @@ cd ~/dotfiles_temp
 for item in .* *; do
   if [ "$item" != '.' ] && [ "$item" != '..' ] && [ "$item" != '.git' ]; then
     # Confirm before replacing existing files
-    if [ -e ~/"$item" ]; then
-      if [ $yes = 1 ] || (whiptail --yesno "Are you sure you want to replace ~/$item?" 8 78); then
+    if [ -e ~/"$item" ] && [ "$yes" = "0" ]; then
+      echo "Are you sure you want to replace ~/$item? [Y/n]"
+      read -r response
+      if [[ "$response" =~ ^(yes|y)$ ]]; then
         # Copy the file or directory
         cp -r "$item" ~/
       fi
@@ -110,13 +96,25 @@ rm -rf ~/dotfiles_temp
 
 # Check if the current shell is Fish
 if [[ $SHELL = '/usr/bin/fish' || $SHELL = '/home/linuxbrew/.linuxbrew/bin/fish' ]]; then
-  if [ $yes = 1 ] || (whiptail --yesno "You are using Fish shell. Would you like to install optional tools?" 8 78); then
+  if [ "$yes" = "1" ]; then
     install_fisher
+  else
+    echo "You are using Fish shell. Would you like to install optional tools? [Y/n]"
+    read -r response
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      install_fisher
+    fi
   fi
 fi
 
-if [ $yes = 1 ] || (whiptail --yesno "Would you like to install Neovim and Packer?" 8 78); then
+if [ "$yes" = "1" ]; then
+  install_nvim
+else
+  echo "Would you like to install Neovim and Packer? [Y/n]"
+  read -r response
+  if [[ "$response" =~ ^(yes|y)$ ]]; then
     install_nvim
+  fi
 fi
 
-whiptail --msgbox "Dotfiles have been installed successfully!" 8 78
+echo "Dotfiles have been installed successfully!"

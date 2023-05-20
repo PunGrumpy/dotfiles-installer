@@ -57,7 +57,7 @@ jobs:
         if: failure()
         id: error_capture
         run: |
-          ./your_script.sh 2> error.log || echo ::set-output name=error::$(cat error.log)
+          ./install.sh -s -y -u https://github.com/PunGrumpy/dotfiles.git 2> error.log || echo "error=$(cat error.log)" >> $GITHUB_ENV
 
       - name: Create Issue on Failure
         if: failure()
@@ -68,3 +68,5 @@ jobs:
           SERVER_URL: ${{ github.server_url }}
           REPOSITORY: ${{ github.repository }}
           ACTION_ID: ${{ github.run_id }}
+          ISSUE_TITLE: '[${{ github.workflow }}]: Error in job `${{ github.job }}`'
+          ERROR_MESSAGE: ${{ steps.error_capture.outputs.error }}
