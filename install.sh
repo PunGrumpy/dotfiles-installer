@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# OS
-OS=$(uname) || $(uname -s) || { echo "❌ Failed to get OS. Exiting..."; exit 1; }
-
 # Default URL
 URL="https://github.com/PunGrumpy/dotfiles.git"
 
@@ -187,7 +184,21 @@ fi
 # Install dotfiles
 install_dotfiles
 
-if [ "$OS" = "Linux"]; then
+# Check OS
+OS=""
+case "$(uname -s)" in
+   Darwin)
+     OS="macOS"
+     ;;
+   Linux)
+     OS="Linux"
+     ;;
+   *)
+     OS="unknown"
+     ;;
+esac
+
+if [ "$OS" = "Linux" ]; then
   clear
   echo "🐧 Running on Linux..."
 
@@ -278,7 +289,7 @@ if [ "$OS" = "Linux"]; then
       install_commitizen
     fi
   fi
-elif [ "$OS" = "Darwin"]; then
+elif [ "$OS" = "macOS" ]; then
   clear
   echo "🍎 Running on macOS..."
 

@@ -1,6 +1,6 @@
 # 🛠️ Dotfiles Installer
 
-This repository contains a script 📜 to install dotfiles from a given GitHub URL. It also includes a GitHub Actions workflow 💫 that tests the script and creates an issue when the workflow fails.
+This repository contains a script 📜 to install dotfiles from a given GitHub URL. It also includes a GitHub Actions workflow 💫 that tests the script on different environments and creates an issue when the workflow fails.
 
 **📌 Highly Recommended:** Use the [Dotfiles](https://github.com/PunGrumpy/dotfiles) repository as a template for your dotfiles (on default).
 
@@ -38,36 +38,38 @@ To install the script, without cloning the repository, you can run:
 curl -s https://raw.githubusercontent.com/PunGrumpy/dotfiles-installer/main/install.sh | bash -h
 ```
 
-If you want to install you should edit `bash -h` to `bash -u <URL>` or follow the instructions in the [Usage](#📖-usage) section.
+If you want to install you should edit `bash -h` and follow the instructions in the [Usage](#📖-usage) section.
 
 ## 📖 Usage
 
 To run the installation script:
 
 ```bash
-./install.sh -u <URL>
+./install.sh
 ```
 
-The `<URL>` should be replaced with the URL of the GitHub repository containing the dotfiles. If no URL is provided, the script will use a default URL.
+You can also use the `-y` 🤫 flag to run the script in silent mode:
+
+```bash
+./install.sh -y
+```
 
 You can also use the `-s` 🤫 flag to run the script in silent mode:
 
 ```bash
-./install.sh -s -u <URL>
+./install.sh -s
 ```
 
-The `-i` 🧰 flag can be used to install Neovim and Packer before installing the dotfiles:
+For example if you want to run the script in silent mode and without confirmation:
 
 ```bash
-./install.sh -i -u <URL>
-```
-
-These flags can be combined as needed. For example, to run the script in silent mode and install Neovim and Packer, you can run:
-
-```bash
-./install.sh -s -i -u <URL>
+./install.sh -s -y
 ```
 
 ## 📃 License
 
 This repository is licensed under the [MIT License](LICENSE) 📝.
+
+```
+
+```
