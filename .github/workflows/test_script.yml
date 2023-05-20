@@ -3,7 +3,7 @@ name: Test Bash Script
 on:
   push:
     branches:
-      - installer
+      - main
 
 permissions:
   contents: read
