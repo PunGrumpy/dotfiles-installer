@@ -55,13 +55,6 @@ function install_buildtool() {
   echo "✔️ Installed build tools successfully!"
 }
 
-# Function to install Xcode Command Line Tools (for macOS)
-function install_xcode_command_line_tools() {
-  echo "📩 Installing Xcode Command Line Tools..."
-  xcode-select --install || { echo "❌ Failed to install Xcode Command Line Tools. Exiting..."; exit 1; }
-  echo "✔️ Xcode Command Line Tools have been installed successfully!"
-}
-
 # Function to install Homebrew (for macOS and Linux)
 function install_homebrew() {
   echo "Installing Homebrew..."
@@ -292,17 +285,6 @@ if [ "$OS" = "Linux" ]; then
 elif [ "$OS" = "macOS" ]; then
   clear
   echo "🍎 Running on macOS..."
-
-  # Install Xcode Command Line Tools
-  if [ "$yes" = 1 ]; then
-    install_xcode_command_line_tools
-  else
-    echo "🤔 Do you want to install Xcode Command Line Tools? [y/N]"
-    read -r response
-    if [[ "$response" =~ ^(yes|y)$ ]]; then
-      install_xcode_command_line_tools
-    fi
-  fi
 
   # Install Homebrew
   if [ "$yes" = 1 ]; then
