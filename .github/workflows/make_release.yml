@@ -34,8 +34,10 @@ jobs:
       - name: Create Tag
         id: create_tag
         run: |
-          git tag -a "release-${GITHUB_RUN_NUMBER}" -m "Release ${{ github.run_number }}"
-          git push origin "release-${GITHUB_RUN_NUMBER}"
+          TAG_NAME="release-${GITHUB_RUN_NUMBER}"
+          git tag -a "$TAG_NAME" -m "Release ${{ github.run_number }}"
+          git push origin "$TAG_NAME"
+          echo "::set-output name=tag_name::$TAG_NAME"
 
       - name: Create release
         id: create_release
