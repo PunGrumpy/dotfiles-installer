@@ -38,7 +38,7 @@ To install the script, without cloning the repository, you can run:
 curl -s https://raw.githubusercontent.com/PunGrumpy/dotfiles-installer/main/install.sh | bash -h
 ```
 
-If you want to install you should edit `bash -h` and follow the instructions in the [Usage](#📖-usage) section.
+If you want to install you should edit `bash -h` and follow the instructions in the [Usage](#-usage) section.
 
 ## 📖 Usage
 
