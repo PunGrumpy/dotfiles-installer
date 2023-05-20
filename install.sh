@@ -1,7 +1,44 @@
 #!/bin/bash
 
+# OS
+OS=$(uname) || $(uname -s) || { echo "❌ Failed to get OS. Exiting..."; exit 1; }
+
 # Default URL
-url="https://github.com/PunGrumpy/dotfiles.git"
+URL="https://github.com/PunGrumpy/dotfiles.git"
+
+# Function to link dotfiles
+function install_dotfiles() {
+  echo "📩 Installing dotfiles..."
+  
+  # Clone the repository
+  git clone "$URL" ~/dotfiles_temp || { echo "Failed to clone repository"; exit 1; }
+
+  # Change directory to the cloned repository
+  cd ~/dotfiles_temp
+
+  # Copy dotfiles to the home directory
+  for item in .* *; do
+    if [ "$item" != '.' ] && [ "$item" != '..' ] && [ "$item" != '.git' ]; then
+      # Confirm before replacing existing files
+      if [ -e ~/"$item" ] && [ "$yes" = "0" ]; then
+        echo "Are you sure you want to replace ~/$item? [Y/n]"
+        read -r response
+        if [[ "$response" =~ ^(yes|y)$ ]]; then
+          # Copy the file or directory
+          cp -r "$item" ~/
+        fi
+      else
+        cp -r "$item" ~/
+      fi
+    fi
+  done
+
+  # Remove the temporary directory
+  cd ~
+  rm -rf ~/dotfiles_temp
+
+  echo "✔️ Dotfiles have been installed successfully!"
+}
 
 # Function to update all packages (for Debian-based distributions)
 function update_packages() {
@@ -10,7 +47,7 @@ function update_packages() {
   echo "✔️ All packages have been updated successfully!"
 }
 
-# Function to install optional build tools for Debian-based distributions
+# Function to install optional build tools (for Debian-based distributions)
 function install_buildtool() {
   echo "📩 Installing build-essential..."
   sudo apt-get -qq install build-essential || { echo "❌ Failed to install build-essential. Exiting..."; exit 1; }
@@ -21,18 +58,32 @@ function install_buildtool() {
   echo "✔️ Installed build tools successfully!"
 }
 
-# Function to install Homebrew
+# Function to install Xcode Command Line Tools (for macOS)
+function install_xcode_command_line_tools() {
+  echo "📩 Installing Xcode Command Line Tools..."
+  xcode-select --install || { echo "❌ Failed to install Xcode Command Line Tools. Exiting..."; exit 1; }
+  echo "✔️ Xcode Command Line Tools have been installed successfully!"
+}
+
+# Function to install Homebrew (for macOS and Linux)
 function install_homebrew() {
   echo "Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || { echo "❌ Failed to install Homebrew. Exiting..."; exit 1; }
   echo "✔️ Homebrew has been installed successfully!"
 }
 
-# Function to configure Homebrew
-function set_homebrew_path() {
+# Function to configure Homebrew (for Linux)
+function set_homebrew_linux_path() {
   echo "⚙️ Configuring Homebrew..."
   (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> /home/runner/.bash_profile || { echo "❌ Failed to configure Homebrew. Exiting..."; exit 1; }
   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" || { echo "❌ Failed to configure Homebrew. Exiting..."; exit 1; }
+  echo "✔️ Homebrew has been configured successfully!"
+}
+
+# Function to configure Homebrew (for macOS)
+function set_homebrew_macos_path() {
+  echo "⚙️ Configuring Homebrew..."
+  echo 'PATH="/usr/local/bin:$PATH"' >> ~/.bash_profile || { echo "❌ Failed to configure Homebrew. Exiting..."; exit 1; }
   echo "✔️ Homebrew has been configured successfully!"
 }
 
@@ -94,7 +145,6 @@ function display_help() {
     echo
     echo "Options:"
     echo "-h, --help            Display this help message."
-    echo "-u, --url <URL>       Specify the URL of the dotfiles repository."
     echo "-s, --silent          Run the script in silent mode."
     echo "-y, --yes             Automatically answer yes to all prompts."
     echo
@@ -106,11 +156,6 @@ silent=0
 yes=0
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -u|--url)
-            url="$2"
-            shift
-            shift
-            ;;
         -s|--silent)
             silent=1
             shift
@@ -131,111 +176,192 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Clone the repository
-git clone "$url" ~/dotfiles_temp || { echo "Failed to clone repository"; exit 1; }
-
-# Change directory to the cloned repository
-cd ~/dotfiles_temp
-
-# Copy dotfiles to the home directory
-for item in .* *; do
-  if [ "$item" != '.' ] && [ "$item" != '..' ] && [ "$item" != '.git' ]; then
-    # Confirm before replacing existing files
-    if [ -e ~/"$item" ] && [ "$yes" = "0" ]; then
-      echo "Are you sure you want to replace ~/$item? [Y/n]"
-      read -r response
-      if [[ "$response" =~ ^(yes|y)$ ]]; then
-        # Copy the file or directory
-        cp -r "$item" ~/
-      fi
-    else
-      cp -r "$item" ~/
-    fi
-  fi
-done
-
-# Remove the temporary directory
-cd ~
-rm -rf ~/dotfiles_temp
+if [ "$silent" = 1 ]; then
+  echo "🤫 Running the script in silent mode..."
+fi
 
 if [ "$yes" = 1 ]; then
-  update_packages
-else
-  echo "Would you like to update all packages? [Y/n]"
-  read -r response
-  if [[ "$response" =~ ^(yes|y)$ ]]; then
+  echo "🤖 Automatically answering yes to all prompts..."
+fi
+
+# Install dotfiles
+install_dotfiles
+
+if [ "$OS" = "Linux"]; then
+  clear
+  echo "🐧 Running on Linux..."
+
+  # Update package lists
+  if [ "$yes" = 1 ]; then
     update_packages
+  else
+    echo "🤔 Do you want to update package lists? [y/N]"
+    read -r response
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      update_packages
+    fi
   fi
-fi
 
-if [ "$yes" = 1]; then
-  install_buildtool
-else
-  echo "Would you like to install build tools? [Y/n]"
-  read -r response
-  if [[ "$response" =~ ^(yes|y)$ ]]; then
-    install_buildtool
+  # Install build tools
+  if [ "$yes" = 1 ]; then
+    install_build_tools
+  else
+    echo "🤔 Do you want to install build tools? [y/N]"
+    read -r response
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      install_build_tools
+    fi
   fi
-fi
 
-if [ "$yes" = "1" ]; then
-  install_homebrew
-else
-  echo "Would you like to install Homebrew? [Y/n]"
-  read -r response
-  if [[ "$response" =~ ^(yes|y)$ ]]; then
+  # Install Homebrew
+  if [ "$yes" = 1 ]; then
     install_homebrew
+  else
+    echo "🤔 Do you want to install Homebrew? [y/N]"
+    read -r response
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      install_homebrew
+    fi
   fi
-fi
 
-if [ "$yes" = "1" ]; then
-  set_homebrew_path
-else
-  echo "Would you like to set PATH for Homebrew? [Y/n]"
-  read -r response
-  if [[ "$response" =~ ^(yes|y)$ ]]; then
-    set_homebrew_path
+  # Set path to Homebrew
+  if [ "$yes" = 1 ]; then
+    set_homebrew_linux_path
+  else
+    echo "🤔 Do you want to set path to Homebrew? [y/N]"
+    read -r response
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      set_homebrew_linux_path
+    fi
   fi
-fi
 
-if [ "$yes" = "1" ]; then
-  install_homebrew_tools
-else
-  echo "Would you like to install optional tools for Homebrew? [Y/n]"
-  read -r response
-  if [[ "$response" =~ ^(yes|y)$ ]]; then
+  # Install optional tools for Homebrew
+  if [ "$yes" = 1 ]; then
     install_homebrew_tools
+  else
+    echo "🤔 Do you want to install optional tools for Homebrew? [y/N]"
+    read -r response
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      install_homebrew_tools
+    fi
   fi
-fi
 
-if [ "$yes" = "1" ]; then
-  set_shell_default
-else
-  echo "Would you like to set default shell to Fish? [Y/n]"
-  read -r response
-  if [[ "$response" =~ ^(yes|y)$ ]]; then
+  # Set default shell to Fish
+  if [ "$yes" = 1 ]; then
     set_shell_default
+  else
+    echo "🤔 Do you want to set default shell to Fish? [y/N]"
+    read -r response
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      set_shell_default
+    fi
   fi
-fi
 
-if [ "$yes" = "1" ]; then
-  install_fisher
-else
-  echo "Would you like to install optional tools for Fish shell? [Y/n]"
-  read -r response
-  if [[ "$response" =~ ^(yes|y)$ ]]; then
+  # Install optional tools for Fish shell
+  if [ "$yes" = 1 ]; then
     install_fisher
+  else
+    echo "🤔 Do you want to install optional tools for Fish shell? [y/N]"
+    read -r response
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      install_fisher
+    fi
   fi
-fi
 
-if [ "$yes" = "1" ]; then
-  install_commitizen
-else
-  echo "Would you like to install commitizen? [Y/n]"
-  read -r response
-  if [[ "$response" =~ ^(yes|y)$ ]]; then
+  # Install commitizen
+  if [ "$yes" = 1 ]; then
     install_commitizen
+  else
+    echo "🤔 Do you want to install commitizen? [y/N]"
+    read -r response
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      install_commitizen
+    fi
   fi
+elif [ "$OS" = "Darwin"]; then
+  clear
+  echo "🍎 Running on macOS..."
+
+  # Install Xcode Command Line Tools
+  if [ "$yes" = 1 ]; then
+    install_xcode_command_line_tools
+  else
+    echo "🤔 Do you want to install Xcode Command Line Tools? [y/N]"
+    read -r response
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      install_xcode_command_line_tools
+    fi
+  fi
+
+  # Install Homebrew
+  if [ "$yes" = 1 ]; then
+    install_homebrew
+  else
+    echo "🤔 Do you want to install Homebrew? [y/N]"
+    read -r response
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      install_homebrew
+    fi
+  fi
+
+  # Set path to Homebrew
+  if [ "$yes" = 1 ]; then
+    set_homebrew_macos_path
+  else
+    echo "🤔 Do you want to set path to Homebrew? [y/N]"
+    read -r response
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      set_homebrew_macos_path
+    fi
+  fi
+
+  # Install optional tools for Homebrew
+  if [ "$yes" = 1 ]; then
+    install_homebrew_tools
+  else
+    echo "🤔 Do you want to install optional tools for Homebrew? [y/N]"
+    read -r response
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      install_homebrew_tools
+    fi
+  fi
+
+  # Set default shell to Fish
+  if [ "$yes" = 1 ]; then
+    set_shell_default
+  else
+    echo "🤔 Do you want to set default shell to Fish? [y/N]"
+    read -r response
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      set_shell_default
+    fi
+  fi
+
+  # Install optional tools for Fish shell
+  if [ "$yes" = 1 ]; then
+    install_fisher
+  else
+    echo "🤔 Do you want to install optional tools for Fish shell? [y/N]"
+    read -r response
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      install_fisher
+    fi
+  fi
+
+  # Install commitizen
+  if [ "$yes" = 1 ]; then
+    install_commitizen
+  else
+    echo "🤔 Do you want to install commitizen? [y/N]"
+    read -r response
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      install_commitizen
+    fi
+  fi
+else
+  echo "❌ Unsupported OS. Exiting..."
+  exit 1
 fi
+  
 
 echo "🎉 Installation completed successfully!"

@@ -14,7 +14,10 @@ env:
 
 jobs:
   test_script:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -28,11 +31,11 @@ jobs:
 
       - name: Run Script with Default URL
         run: |
-          ./install.sh -s -y -u https://github.com/PunGrumpy/dotfiles.git
+          ./install.sh -s -y
 
       - name: Test Dotfiles Installation
         run: |
-          [[ -d /home/linuxbrew/.linuxbrew ]] || exit 1
+          [[ -d /home/linuxbrew/.linuxbrew ]] || [[ -d /usr/local/Homebrew ]] || exit 1
           [[ -d ~/.config ]] || exit 1
           [[ -f ~/.czrc ]] || exit 1
           [[ -f ~/.gitconfig ]] || exit 1

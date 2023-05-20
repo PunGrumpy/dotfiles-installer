@@ -2,11 +2,27 @@
 
 This repository contains a script 📜 to install dotfiles from a given GitHub URL. It also includes a GitHub Actions workflow 💫 that tests the script and creates an issue when the workflow fails.
 
+**📌 Highly Recommended:** Use the [Dotfiles](https://github.com/PunGrumpy/dotfiles) repository as a template for your dotfiles (on default).
+
 ## 💻 Available on
 
 - Linux 🐧
-- ~~macOS 🍎~~
+- macOS 🍎
 - ~~Windows 🪟~~
+
+## 📜 About
+
+Here's what install.sh will do:
+
+1. Clone the dotfiles repository to a temporary directory.
+2. Copy the dotfiles to your home directory.
+3. Update all packages (for Debian-based distributions).
+4. Install optional build tools for Debian-based distributions.
+5. Install Homebrew and some optional tools for it.
+6. Set Fish as the default shell.
+7. Install optional tools for the Fish shell.
+8. Install commitizen for standardizing commit messages.
+9. You will be prompted for confirmation before each step (unless you run the script with `-y` or `--yes`).
 
 ## 📥 Installation
 
