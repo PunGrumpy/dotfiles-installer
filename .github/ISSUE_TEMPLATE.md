@@ -14,7 +14,7 @@ The workflow run [{{ env.WORKFLOW_NAME }}]({{ env.SERVER_URL }}/{{ env.REPOSITOR
 
 ## Details 📝
 
-**Error message:** {{ ERROR_MESSAGE }}
+**Error message:** {{ env.ERROR_MESSAGE }}
 
 **Logs:** [View logs]({{ env.SERVER_URL }}/{{ env.REPOSITORY }}/actions/runs/{{ env.ACTION_ID }})
 

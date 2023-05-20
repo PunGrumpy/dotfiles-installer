@@ -5,6 +5,8 @@ This repository contains a script 📜 to install dotfiles from a given GitHub U
 ## 💻 Available on
 
 - Linux 🐧
+- ~~macOS 🍎~~
+- ~~Windows 🪟~~
 
 ## 📥 Installation
 
