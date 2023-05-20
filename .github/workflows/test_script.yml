@@ -9,6 +9,9 @@ permissions:
   contents: read
   issues: write
 
+env:
+  ERROR: '😤 Please check the logs for more information.'
+
 jobs:
   test_script:
     runs-on: ubuntu-latest
@@ -22,10 +25,6 @@ jobs:
       - name: Set execute permissions on script
         run: |
           chmod +x install.sh
-
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update
 
       - name: Run Script with Default URL
         run: |
@@ -59,7 +58,8 @@ jobs:
         if: failure()
         id: error_capture
         run: |
-          ./install.sh -s -y -u https://github.com/PunGrumpy/dotfiles.git 2> error.log || echo "error=$(cat error.log)" >> $GITHUB_ENV
+          echo "ERROR='' >> $GITHUB_ENV"
+          ./install.sh -s -y -u https://github.com/PunGrumpy/dotfiles.git 2> error.log || echo "ERROR=$(cat error.log)" >> $GITHUB_ENV
 
       - name: Create Issue on Failure
         if: failure()
@@ -71,4 +71,4 @@ jobs:
           REPOSITORY: ${{ github.repository }}
           ACTION_ID: ${{ github.run_id }}
           ISSUE_TITLE: '[${{ github.workflow }}]: Error in job `${{ github.job }}`'
-          ERROR_MESSAGE: ${{ steps.error_capture.outputs.error }}
+          ERROR_MESSAGE: ${{ env.ERROR }}
