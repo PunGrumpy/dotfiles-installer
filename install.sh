@@ -22,6 +22,18 @@ function install_fisher() {
   echo "Optional tools for Fish shell have been installed successfully!"
 }
 
+function install_brew() {
+  echo "Installing Homebrew..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || { echo "Failed to install Homebrew. Exiting..."; exit 1; }
+  echo "Homebrew has been installed successfully!"
+}
+
+function install_commitizen() {
+  echo "Installing commitizen..."
+  npm install -g commitizen cz-conventional-changelog || { echo "Failed to install commitizen. Exiting..."; exit 1; }
+  echo "Commitizen has been installed successfully!"
+}
+
 # Function to display help
 function display_help() {
     echo "Usage: $0 [options] -u <URL>"
@@ -94,7 +106,6 @@ done
 cd ~
 rm -rf ~/dotfiles_temp
 
-# Check if the current shell is Fish
 if [[ $SHELL = '/usr/bin/fish' || $SHELL = '/home/linuxbrew/.linuxbrew/bin/fish' ]]; then
   if [ "$yes" = "1" ]; then
     install_fisher
@@ -104,6 +115,49 @@ if [[ $SHELL = '/usr/bin/fish' || $SHELL = '/home/linuxbrew/.linuxbrew/bin/fish'
     if [[ "$response" =~ ^(yes|y)$ ]]; then
       install_fisher
     fi
+  fi
+fi
+
+if [ "$yes" = "1" ]; then
+  install_brew
+else
+  echo "Would you like to install Homebrew? [Y/n]"
+  read -r response
+  if [[ "$response" =~ ^(yes|y)$ ]]; then
+    install_brew
+  fi
+fi
+
+if [ "$yes" = "1" ]; then
+  install_commitizen
+else
+  echo "Would you like to install commitizen? [Y/n]"
+  read -r response
+  if [[ "$response" =~ ^(yes|y)$ ]]; then
+    # Check if npm is installed
+    if ! command -v npm &> /dev/null; then
+      echo "npm is not installed. Exiting..."
+      echo "Would you like to install npm by Homebrew? [Y/n]"
+      read -r response
+      if [[ "$response" =~ ^(yes|y)$ ]]; then
+        echo "Installing npm..."
+        brew install npm || { echo "Failed to install npm. Exiting..."; exit 1; }
+        echo "npm has been installed successfully!"
+      fi
+
+      echo "Would you like to install npm by apt? [Y/n]"
+      read -r response
+      if [[ "$response" =~ ^(yes|y)$ ]]; then
+        echo "Installing npm..."
+        sudo apt-get install -y npm || { echo "Failed to install npm. Exiting..."; exit 1; }
+        echo "npm has been installed successfully!"
+      fi
+      
+      echo "You can install npm by yourself and run this script again."
+      exit 1
+    fi
+
+    install_commitizen
   fi
 fi
 
