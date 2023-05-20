@@ -69,7 +69,3 @@ For example if you want to run the script in silent mode and without confirmatio
 ## 📃 License
 
 This repository is licensed under the [MIT License](LICENSE) 📝.
-
-```
-
-```
