@@ -2,6 +2,10 @@
 
 This repository contains a script 📜 to install dotfiles from a given GitHub URL. It also includes a GitHub Actions workflow 💫 that tests the script and creates an issue when the workflow fails.
 
+## 💻 Available on
+
+- Linux 🐧
+
 ## 📥 Installation
 
 To install the script, on file, you can run:

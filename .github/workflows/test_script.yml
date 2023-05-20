@@ -26,7 +26,6 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git whiptail neovim
 
       - name: Run Script with Default URL
         run: |
@@ -41,10 +40,13 @@ jobs:
 
       - name: Cleanup
         run: |
+          echo "Cleaning up config files..."
           rm -rf ~/.config
           rm -rf ~/.czrc
           rm -rf ~/.gitconfig
           rm -rf ~/.gitignore
+          echo "Cleaning up path Homebrew..."
+          rm -rf /home/linuxbrew/.linuxbrew
 
       - name: Capture Workflow Artifacts
         if: failure()

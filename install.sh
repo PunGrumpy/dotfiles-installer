@@ -3,14 +3,54 @@
 # Default URL
 url="https://github.com/PunGrumpy/dotfiles.git"
 
-# Function to install Neovim and Packer
-function install_nvim() {
-    echo "Installing Neovim and Packer..."
-    sudo apt-get install -y neovim || { echo "Failed to install Neovim. Exiting..."; exit 1; }
-    git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim || { echo "Failed to install Packer. Exiting..."; exit 1; }
-    echo "Neovim and Packer have been installed successfully!"
+# Function to update all packages (for Debian-based distributions)
+function update_packages() {
+  echo "📩 Updating all packages..."
+  sudo apt update -y || { echo "❌ Failed to update all packages. Exiting..."; exit 1; }
+  echo "✔️ All packages have been updated successfully!"
 }
 
+# Function to install optional build tools for Debian-based distributions
+function install_buildtool() {
+  echo "📩 Installing build-essential..."
+  sudo apt-get install build-essential || { echo "❌ Failed to install build-essential. Exiting..."; exit 1; }
+  sudo apt-get install procps || { echo "❌ Failed to install procps. Exiting..."; exit 1; }
+  sudo apt-get install curl || { echo "❌ Failed to install curl. Exiting..."; exit 1; }
+  sudo apt-get install file || { echo "❌ Failed to install file. Exiting..."; exit 1; }
+  sudo apt-get install git || { echo "❌ Failed to install git. Exiting..."; exit 1; }
+  echo "✔️ Installed build tools successfully!"
+}
+
+# Function to install Homebrew
+function install_homebrew() {
+  echo "Installing Homebrew..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || { echo "❌ Failed to install Homebrew. Exiting..."; exit 1; }
+  echo "✔️ Homebrew has been installed successfully!"
+}
+
+# Function to install optional tools for Homebrew
+function install_homebrew_tools() {
+  echo "📩 Installing optional tools for Homebrew..."
+  brew install fish || { echo "❌ Failed to install fish. Exiting..."; exit 1; }
+  brew install tmux || { echo "❌ Failed to install tmux. Exiting..."; exit 1; }
+  brew install gcc || { echo "❌ Failed to install gcc. Exiting..."; exit 1; }
+  brew install neovim || { echo "❌ Failed to install neovim. Exiting..."; exit 1; }
+  brew install exa || { echo "❌ Failed to install exa. Exiting..."; exit 1; }
+  brew install peco || { echo "❌ Failed to install peco. Exiting..."; exit 1; }
+  brew install ghq || { echo "❌ Failed to install ghq. Exiting..."; exit 1; }
+  brew install node || { echo "❌ Failed to install node. Exiting..."; exit 1; }
+  echo "✔️ Optional tools for Homebrew have been installed successfully!"
+}
+
+# Function to setting default shell to Fish
+function set_shell_default() {
+  echo "⚙️ Setting default shell to Fish..."
+  sudo sh -c "echo $(which fish) >> /etc/shells" || { echo "❌ Failed to set default shell to Fish. Exiting..."; exit 1; }
+  chsh -s "$(which fish)" || { echo "❌ Failed to set default shell to Fish. Exiting..."; exit 1; }
+  echo "✔️ Default shell has been set to Fish successfully!"
+}
+
+# Function to install optional tools for Fish shell
 function install_fisher() {
   echo "Installing optional tools for Fish shell..."
   curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
@@ -22,15 +62,10 @@ function install_fisher() {
   echo "Optional tools for Fish shell have been installed successfully!"
 }
 
-function install_brew() {
-  echo "Installing Homebrew..."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || { echo "Failed to install Homebrew. Exiting..."; exit 1; }
-  echo "Homebrew has been installed successfully!"
-}
-
+# Function to install commitizen
 function install_commitizen() {
   echo "Installing commitizen..."
-  npm install -g commitizen cz-conventional-changelog || { echo "Failed to install commitizen. Exiting..."; exit 1; }
+  npm install -g commitizen cz-conventional-changelog || { echo "Failed to install commitizen. Exiting..."; exit 1;}
   echo "Commitizen has been installed successfully!"
 }
 
@@ -106,25 +141,63 @@ done
 cd ~
 rm -rf ~/dotfiles_temp
 
-if [[ $SHELL = '/usr/bin/fish' || $SHELL = '/home/linuxbrew/.linuxbrew/bin/fish' ]]; then
-  if [ "$yes" = "1" ]; then
-    install_fisher
-  else
-    echo "You are using Fish shell. Would you like to install optional tools? [Y/n]"
-    read -r response
-    if [[ "$response" =~ ^(yes|y)$ ]]; then
-      install_fisher
-    fi
+if [ "$yes" = 1 ]; then
+  update_packages
+else
+  echo "Would you like to update all packages? [Y/n]"
+  read -r response
+  if [[ "$response" =~ ^(yes|y)$ ]]; then
+    update_packages
+  fi
+fi
+
+if [ "$yes" = 1]; then
+  install_buildtool
+else
+  echo "Would you like to install build tools? [Y/n]"
+  read -r response
+  if [[ "$response" =~ ^(yes|y)$ ]]; then
+    install_buildtool
   fi
 fi
 
 if [ "$yes" = "1" ]; then
-  install_brew
+  install_homebrew
 else
   echo "Would you like to install Homebrew? [Y/n]"
   read -r response
   if [[ "$response" =~ ^(yes|y)$ ]]; then
-    install_brew
+    install_homebrew
+  fi
+fi
+
+if [ "$yes" = "1" ]; then
+  install_homebrew_tools
+else
+  echo "Would you like to install optional tools for Homebrew? [Y/n]"
+  read -r response
+  if [[ "$response" =~ ^(yes|y)$ ]]; then
+    install_homebrew_tools
+  fi
+fi
+
+if [ "$yes" = "1" ]; then
+  set_shell_default
+else
+  echo "Would you like to set default shell to Fish? [Y/n]"
+  read -r response
+  if [[ "$response" =~ ^(yes|y)$ ]]; then
+    set_shell_default
+  fi
+fi
+
+if [ "$yes" = "1" ]; then
+  install_fisher
+else
+  echo "Would you like to install optional tools for Fish shell? [Y/n]"
+  read -r response
+  if [[ "$response" =~ ^(yes|y)$ ]]; then
+    install_fisher
   fi
 fi
 
@@ -134,41 +207,8 @@ else
   echo "Would you like to install commitizen? [Y/n]"
   read -r response
   if [[ "$response" =~ ^(yes|y)$ ]]; then
-    # Check if npm is installed
-    if ! command -v npm &> /dev/null; then
-      echo "npm is not installed. Exiting..."
-      echo "Would you like to install npm by Homebrew? [Y/n]"
-      read -r response
-      if [[ "$response" =~ ^(yes|y)$ ]]; then
-        echo "Installing npm..."
-        brew install npm || { echo "Failed to install npm. Exiting..."; exit 1; }
-        echo "npm has been installed successfully!"
-      fi
-
-      echo "Would you like to install npm by apt? [Y/n]"
-      read -r response
-      if [[ "$response" =~ ^(yes|y)$ ]]; then
-        echo "Installing npm..."
-        sudo apt-get install -y npm || { echo "Failed to install npm. Exiting..."; exit 1; }
-        echo "npm has been installed successfully!"
-      fi
-      
-      echo "You can install npm by yourself and run this script again."
-      exit 1
-    fi
-
     install_commitizen
   fi
 fi
 
-if [ "$yes" = "1" ]; then
-  install_nvim
-else
-  echo "Would you like to install Neovim and Packer? [Y/n]"
-  read -r response
-  if [[ "$response" =~ ^(yes|y)$ ]]; then
-    install_nvim
-  fi
-fi
-
-echo "Dotfiles have been installed successfully!"
+echo "🎉 Installation completed successfully!"
