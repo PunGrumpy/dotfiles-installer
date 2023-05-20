@@ -67,13 +67,16 @@ function set_shell_default() {
 # Function to install optional tools for Fish shell
 function install_fisher() {
   echo "Installing optional tools for Fish shell..."
-  curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fish -c "fisher install jorgebucaran/fisher" || { echo "❌ Failed to install fisher. Exiting..."; exit 1;}
-  fish -c "fisher install jethrokuan/z" || { echo "❌ Failed to install z. Exiting..."; exit 1;}
-  fish -c "fisher install jethrokuan/fzf" || { echo "❌ Failed to install fzf. Exiting..."; exit 1;}
-  fish -c "fisher install fisher install nickeb96/puffer-fish" || { echo "❌ Failed to install puffer-fish. Exiting..."; exit 1;}
-  fish -c "fisher install laughedelic/pisces" || { echo "❌ Failed to install pisces. Exiting..."; exit 1;}
-  fish -c "fisher install ilancosman/tide@v5" || { echo "❌ Failed to install tide. Exiting..."; exit 1;}
-  echo "✔️ Optional tools for Fish shell have been installed successfully!"
+  fish -c "
+    curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source;
+    fisher install jorgebucaran/fisher || echo '❌ Failed to install fisher. Exiting...' && exit 1;
+    fisher install jethrokuan/z || echo '❌ Failed to install z. Exiting...' && exit 1;
+    fisher install jethrokuan/fzf || echo '❌ Failed to install fzf. Exiting...' && exit 1;
+    fisher install nickeb96/puffer-fish || echo '❌ Failed to install puffer-fish. Exiting...' && exit 1;
+    fisher install laughedelic/pisces || echo '❌ Failed to install pisces. Exiting...' && exit 1;
+    fisher install ilancosman/tide@v5 || echo '❌ Failed to install tide. Exiting...' && exit 1;
+    echo '✔️ Optional tools for Fish shell have been installed successfully!'
+  "
 }
 
 # Function to install commitizen
