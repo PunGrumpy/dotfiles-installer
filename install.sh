@@ -28,6 +28,14 @@ function install_homebrew() {
   echo "✔️ Homebrew has been installed successfully!"
 }
 
+# Function to configure Homebrew
+function set_homebrew_path() {
+  echo "⚙️ Configuring Homebrew..."
+  (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> /home/runner/.bash_profile || { echo "❌ Failed to configure Homebrew. Exiting..."; exit 1; }
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" || { echo "❌ Failed to configure Homebrew. Exiting..."; exit 1; }
+  echo "✔️ Homebrew has been configured successfully!"
+}
+
 # Function to install optional tools for Homebrew
 function install_homebrew_tools() {
   echo "📩 Installing optional tools for Homebrew..."
@@ -168,6 +176,16 @@ else
   read -r response
   if [[ "$response" =~ ^(yes|y)$ ]]; then
     install_homebrew
+  fi
+fi
+
+if [ "$yes" = "1" ]; then
+  set_homebrew_path
+else
+  echo "Would you like to set PATH for Homebrew? [Y/n]"
+  read -r response
+  if [[ "$response" =~ ^(yes|y)$ ]]; then
+    set_homebrew_path
   fi
 fi
 
