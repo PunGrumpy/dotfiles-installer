@@ -13,8 +13,10 @@ curl -s https://raw.githubusercontent.com/PunGrumpy/dotfiles-installer/main/inst
 To install the script, without cloning the repository, you can run:
 
 ```bash
-curl -s https://raw.githubusercontent.com/PunGrumpy/dotfiles-installer/main/install.sh | bash h
+curl -s https://raw.githubusercontent.com/PunGrumpy/dotfiles-installer/main/install.sh | bash -h
 ```
+
+If you want to install you should edit `bash -h` to `bash -u <URL>` or follow the instructions in the [Usage](#📖-usage) section.
 
 ## 📖 Usage
 
