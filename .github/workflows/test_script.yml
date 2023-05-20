@@ -27,20 +27,21 @@ jobs:
 
       - name: Run Script with Default URL
         run: |
-          ./install.sh -s -i
+          echo "https://github.com/PunGrumpy/dotfiles.git" | ./install.sh -s -u
 
       - name: Test Dotfiles Installation
         run: |
-          if [ -d ~/dotfiles_temp ]; then
-            echo "Dotfiles installation failed"
-            exit 1
-          else
-            echo "Dotfiles installation succeeded"
-          fi
+          [[ -d ~/.config ]] || exit 1
+          [[ -f ~/.czrc ]] || exit 1
+          [[ -f ~/.gitconfig ]] || exit 1
+          [[ -f ~/.gitignore ]] || exit 1
 
       - name: Cleanup
         run: |
-          rm -rf ~/dotfiles_temp
+          rm -rf ~/.config
+          rm -rf ~/.czrc
+          rm -rf ~/.gitconfig
+          rm -rf ~/.gitignore
 
       - name: Capture Workflow Artifacts
         if: failure()
