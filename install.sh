@@ -13,11 +13,11 @@ function update_packages() {
 # Function to install optional build tools for Debian-based distributions
 function install_buildtool() {
   echo "📩 Installing build-essential..."
-  sudo apt-get install build-essential || { echo "❌ Failed to install build-essential. Exiting..."; exit 1; }
-  sudo apt-get install procps || { echo "❌ Failed to install procps. Exiting..."; exit 1; }
-  sudo apt-get install curl || { echo "❌ Failed to install curl. Exiting..."; exit 1; }
-  sudo apt-get install file || { echo "❌ Failed to install file. Exiting..."; exit 1; }
-  sudo apt-get install git || { echo "❌ Failed to install git. Exiting..."; exit 1; }
+  sudo apt-get -qq install build-essential || { echo "❌ Failed to install build-essential. Exiting..."; exit 1; }
+  sudo apt-get -qq install procps || { echo "❌ Failed to install procps. Exiting..."; exit 1; }
+  sudo apt-get -qq install curl || { echo "❌ Failed to install curl. Exiting..."; exit 1; }
+  sudo apt-get -qq install file || { echo "❌ Failed to install file. Exiting..."; exit 1; }
+  sudo apt-get -qq install git || { echo "❌ Failed to install git. Exiting..."; exit 1; }
   echo "✔️ Installed build tools successfully!"
 }
 
@@ -53,8 +53,14 @@ function install_homebrew_tools() {
 # Function to setting default shell to Fish
 function set_shell_default() {
   echo "⚙️ Setting default shell to Fish..."
-  sudo sh -c "echo $(which fish) >> /etc/shells" || { echo "❌ Failed to set default shell to Fish. Exiting..."; exit 1; }
-  chsh -s "$(which fish)" || { echo "❌ Failed to set default shell to Fish. Exiting..."; exit 1; }
+  if ! command -v fish &> /dev/null; then
+    echo "❌ Fish is not installed. Exiting..."
+    exit 1
+  fi
+  if ! grep -q "$(command -v fish)" /etc/shells; then
+    sudo sh -c "echo $(command -v fish) >> /etc/shells" || { echo "❌ Failed to add Fish to /etc/shells. Exiting..."; exit 1; }
+  fi
+  echo "$USER" | sudo -S chsh -s "$(command -v fish)" || { echo "❌ Failed to set default shell to Fish. Exiting..."; exit 1; }
   echo "✔️ Default shell has been set to Fish successfully!"
 }
 
