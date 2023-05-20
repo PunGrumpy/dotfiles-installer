@@ -12,7 +12,7 @@ assignees: 'PunGrumpy'
 
 The workflow run [{{ env.WORKFLOW_NAME }}]({{ env.SERVER_URL }}/{{ env.REPOSITORY }}/actions/runs/{{ env.ACTION_ID }}) failed.
 
-### Details 📝
+## Details 📝
 
 **Error message:** {{ ERROR_MESSAGE }}
 
