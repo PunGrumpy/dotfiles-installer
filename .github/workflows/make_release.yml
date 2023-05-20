@@ -6,6 +6,10 @@ on:
     types:
       - completed
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   release:
     name: 'Release'
