@@ -4,6 +4,20 @@ This repository contains a script 📜 to install dotfiles from a given GitHub U
 
 ## 📥 Installation
 
+To install the script, on file, you can run:
+
+```bash
+curl -s https://raw.githubusercontent.com/PunGrumpy/dotfiles-installer/main/install.sh -o install.sh
+```
+
+To install the script, without cloning the repository, you can run:
+
+```bash
+curl -s https://raw.githubusercontent.com/PunGrumpy/dotfiles-installer/main/install.sh | bash h
+```
+
+## 📖 Usage
+
 To run the installation script:
 
 ```bash
