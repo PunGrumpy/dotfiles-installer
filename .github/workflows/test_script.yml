@@ -27,7 +27,7 @@ jobs:
 
       - name: Run Script with Default URL
         run: |
-          ./install.sh -s -u https://github.com/PunGrumpy/dotfiles.git
+          ./install.sh -s -y -u https://github.com/PunGrumpy/dotfiles.git
 
       - name: Test Dotfiles Installation
         run: |

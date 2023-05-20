@@ -32,14 +32,14 @@ function display_help() {
     echo "-h, --help            Display this help message."
     echo "-u, --url <URL>       Specify the URL of the dotfiles repository."
     echo "-s, --silent          Run the script in silent mode."
+    echo "-y, --yes             Automatically answer yes to all prompts."
     echo
     echo "If no URL is provided, the script will use a default URL."
 }
 
 # Argument parsing
 silent=0
-install_nvim=0
-
+yes=0
 while [[ $# -gt 0 ]]; do
     case $1 in
         -u|--url)
@@ -49,6 +49,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -s|--silent)
             silent=1
+            shift
+            ;;
+        -y|--yes)
+            yes=1
             shift
             ;;
         -h|--help)
@@ -70,11 +74,13 @@ if ! command -v whiptail &> /dev/null; then
 fi
 
 # Get the URL
-url=$(whiptail --inputbox "Enter the URL of the dotfiles repository" 8 78 "$url" --title "Dotfiles Installation" 3>&1 1>&2 2>&3)
-exitstatus=$?
-if [ $exitstatus != 0 ]; then
-    echo "User cancelled the operation."
-    exit 1
+if [ $yes = 0 ]; then
+    url=$(whiptail --inputbox "Enter the URL of the dotfiles repository" 8 78 "$url" --title "Dotfiles Installation" 3>&1 1>&2 2>&3)
+    exitstatus=$?
+    if [ $exitstatus != 0 ]; then
+        echo "User cancelled the operation."
+        exit 1
+    fi
 fi
 
 # Clone the repository
@@ -88,7 +94,7 @@ for item in .* *; do
   if [ "$item" != '.' ] && [ "$item" != '..' ] && [ "$item" != '.git' ]; then
     # Confirm before replacing existing files
     if [ -e ~/"$item" ]; then
-      if (whiptail --yesno "Are you sure you want to replace ~/$item?" 8 78); then
+      if [ $yes = 1 ] || (whiptail --yesno "Are you sure you want to replace ~/$item?" 8 78); then
         # Copy the file or directory
         cp -r "$item" ~/
       fi
@@ -104,16 +110,13 @@ rm -rf ~/dotfiles_temp
 
 # Check if the current shell is Fish
 if [ $SHELL = '/usr/bin/fish' || $SHELL = '/home/linuxbrew/.linuxbrew/bin/fish' ]; then
-  if (whiptail --yesno "You are using Fish shell. Would you like to install optional tools?" 8 78); then
+  if [ $yes = 1 ] || (whiptail --yesno "You are using Fish shell. Would you like to install optional tools?" 8 78); then
     install_fisher
   fi
 fi
 
-# Install Neovim and Packer if requested
-if [ $install_nvim = 1 ]; then
-    if (whiptail --yesno "Would you like to install Neovim and Packer?" 8 78); then
-        install_nvim
-    fi
+if [ $yes = 1 ] || (whiptail --yesno "Would you like to install Neovim and Packer?" 8 78); then
+    install_nvim
 fi
 
 whiptail --msgbox "Dotfiles have been installed successfully!" 8 78
