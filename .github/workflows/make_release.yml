@@ -16,8 +16,39 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: 'Upload release asset'
-        uses: 'xresloader/upload-to-github-release@v1'
+      - name: Generate Changelog
+        id: changelog
+        uses: charmixer/auto-changelog-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref.tag }}
+          release_name: 'Release ${{ github.ref.tag }} 📢'
+          body: |
+            ## Changelog
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            ## Installation
+
+            ### Linux
+
+            ```bash
+            curl -sSL https://raw.githubusercontent.com/PunGrumpy/dotfiles-installer/main/install.sh | bash
+            ```
+            ---
+            Thank you for downloading and using dotfiles installer! 🎉
+          draft: false
+          prerelease: false
+
+      - name: Upload release asset
+        uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -25,3 +56,6 @@ jobs:
           tags: true
           draft: false
           tag_name: ${{ github.ref.tag }}
+          release_id: ${{ steps.create_release.outputs.id }}
+          overwrite: true
+          verbose: true
