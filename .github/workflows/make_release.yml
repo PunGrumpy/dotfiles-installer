@@ -14,46 +14,17 @@ jobs:
 
     steps:
       - name: 'Determine tag'
-        run: 'echo "RELEASE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV'
+        run: echo "RELEASE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: 'Create release'
-        id: create_release
-        uses: 'actions/github-script@v6'
+      - name: 'Upload release asset'
+        uses: 'xresloader/upload-to-github-release@v1'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          github-token: '${{ secrets.GITHUB_TOKEN }}'
-          script: |
-            const response = await github.rest.repos.createRelease({
-              draft: false,
-              generate_release_notes: true,
-              name: process.env.RELEASE_TAG,
-              owner: context.repo.owner,
-              prerelease: false,
-              repo: context.repo.repo,
-              tag_name: process.env.RELEASE_TAG,
-            });
-            return response.data.upload_url;
-
-      - name: Upload release asset
-        uses: 'actions/github-script@v6'
-        with:
-          github-token: '${{ secrets.GITHUB_TOKEN }}'
-          script: |
-            const fs = require('fs');
-            const artifactPath = './install.sh';
-            const artifactName = require('path').basename(artifactPath);
-            const artifactMimeType = 'text/x-shellscript';
-            const artifactData = fs.readFileSync(artifactPath);
-            const uploadUrl = '${{ steps.create_release.outputs.result }}';
-            const { data } = await github.rest.repos.uploadReleaseAsset({
-              url: uploadUrl,
-              headers: {
-                'content-type': artifactMimeType,
-                'content-length': artifactData.length,
-              },
-              name: artifactName,
-              data: artifactData,
-            });
-            return data.browser_download_url;
+          file: 'install.sh'
+          tags: true
+          draft: false
+          tag_name: ${{ env.RELEASE_TAG }}
