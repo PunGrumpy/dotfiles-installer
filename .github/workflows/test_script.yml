@@ -32,6 +32,7 @@ jobs:
 
       - name: Test Dotfiles Installation
         run: |
+          [[ -d /home/linuxbrew/.linuxbrew ]] || exit 1
           [[ -d ~/.config ]] || exit 1
           [[ -f ~/.czrc ]] || exit 1
           [[ -f ~/.gitconfig ]] || exit 1
