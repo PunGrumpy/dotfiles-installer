@@ -13,9 +13,6 @@ jobs:
     if: github.event.workflow_run.conclusion == 'success'
 
     steps:
-      - name: 'Determine tag'
-        run: echo "RELEASE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -27,4 +24,4 @@ jobs:
           file: 'install.sh'
           tags: true
           draft: false
-          tag_name: ${{ env.RELEASE_TAG }}
+          tag_name: ${{ github.ref.tag }}
